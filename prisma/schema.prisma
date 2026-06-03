@@ -1,0 +1,50 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  shortName       String
+  clientName      String   @default("Excellenta Cyber")
+  description     String
+  techStack       String   // JSON string array: ["Python", "Flask", ...]
+  techDetails     String   // JSON string: [{name, category}] with category info
+  deploymentNotes String?  // Deployment info from MD files
+  runtimeNotes    String?  // Runtime/setup requirements from MD files
+  siteUrl         String?
+  localDir        String?
+  status          String   @default("Active")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  notes Note[]
+  todos Todo[]
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  projectId String
+  content   String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Todo {
+  id        String   @id @default(cuid())
+  projectId String
+  text      String
+  done      Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
