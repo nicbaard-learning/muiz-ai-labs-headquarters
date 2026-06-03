@@ -16,6 +16,7 @@ interface ProjectSeed {
   deploymentNotes: string | null;
   runtimeNotes: string | null;
   siteUrl: string | null;
+  localDir: string | null;
   status: string;
 }
 
@@ -70,7 +71,8 @@ const projects: ProjectSeed[] = [
       "Deployment follows a Git-driven flow through Azure DevOps and then onto Hetzner infrastructure:\n\n- Source control is maintained in Git.\n- Code changes are pushed to Azure DevOps repositories as the central integration point.\n- From Azure DevOps, the deployment workflow is promoted to the Hetzner-hosted environment.\n- Hetzner runs the production instance of the Excellenta TPRM platform.",
     runtimeNotes:
       "- Python 3.8+\n- Virtual environment support (venv recommended)\n- Git\n- Environment variable configuration for application secrets, database connection, SMTP email delivery, and AI/external service keys",
-    siteUrl: null,
+    siteUrl: "https://testsitepyt.excellentacyber.com/login",
+    localDir: "D:\\projects\\PROJECT_DETAILS_TPRM",
     status: "Active",
   },
   {
@@ -115,6 +117,7 @@ const projects: ProjectSeed[] = [
     runtimeNotes:
       "- Python 3.12+\n- Node.js 20+ (tested with v24)\n- No database server required for local development (SQLite)\n- Environment variables: DATABASE_URL, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES",
     siteUrl: null,
+    localDir: "D:\\projects\\PROJECT_DETAILS_GRC",
     status: "Early Development",
   },
   {
@@ -160,7 +163,8 @@ const projects: ProjectSeed[] = [
       "Deployment follows a Git-driven flow through GitHub and onto Render:\n\n- Source control is maintained in Git (GitHub: nicbaard-learning/excellenta-sfr).\n- Code changes are pushed to the GitHub repository as the central integration point.\n- From GitHub, Render auto-deploys via connected repository and blueprint configuration (render.yaml).",
     runtimeNotes:
       "- Python 3.12+\n- Virtual environment support (venv recommended)\n- Git\n- PostgreSQL 15+\n- Environment variables: DATABASE_URL, MCP_API_KEY, application title/version metadata, allowed host/origin lists",
-    siteUrl: null,
+    siteUrl: "https://excellenta-sfr.onrender.com/",
+    localDir: "D:\\projects\\PROJECT_DETAILS_SFR",
     status: "Active",
   },
   {
@@ -196,6 +200,7 @@ const projects: ProjectSeed[] = [
     runtimeNotes:
       "- Node.js 18+/20+\n- VAPID keys for web-push notifications\n- Firebase configuration\n- Listens on port 3000\n- Roster scheduler\n- Clickable support wall\n- Media hosting via Firebase Cloud Storage\n- Instant push alerts\n- WhatsApp integration",
     siteUrl: null,
+    localDir: null,
     status: "Active",
   },
 ];
@@ -280,6 +285,7 @@ export async function GET() {
           deploymentNotes: p.deploymentNotes,
           runtimeNotes: p.runtimeNotes,
           siteUrl: p.siteUrl,
+          localDir: p.localDir,
           status: p.status,
         },
         create: {
@@ -293,6 +299,7 @@ export async function GET() {
           deploymentNotes: p.deploymentNotes,
           runtimeNotes: p.runtimeNotes,
           siteUrl: p.siteUrl,
+          localDir: p.localDir,
           status: p.status,
         },
       });
