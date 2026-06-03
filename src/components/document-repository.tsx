@@ -6,7 +6,6 @@ import {
   HiOutlinePlus,
   HiOutlineTrash,
   HiOutlineX,
-  HiOutlineChevronLeft,
   HiOutlineUpload,
 } from "react-icons/hi";
 import MDViewer from "./md-viewer";
@@ -120,7 +119,6 @@ export default function DocumentRepository({
     if (file) {
       uploadFile(file);
     }
-    // Reset so the same file can be picked again
     e.target.value = "";
   }
 
@@ -142,163 +140,179 @@ export default function DocumentRepository({
     setDragOver(false);
   }
 
-  // Viewing a document
-  if (selectedDoc) {
-    return (
-      <div className="glass rounded-2xl overflow-hidden animate-fade-in-up">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/5">
-          <button
-            onClick={() => setSelectedDoc(null)}
-            className="flex items-center gap-1.5 text-sm text-muiz-400 hover:text-white transition-colors"
-          >
-            <HiOutlineChevronLeft className="w-4 h-4" />
-            Back to documents
-          </button>
-          <button
-            onClick={() => deleteDocument(selectedDoc.id)}
-            className="p-1.5 rounded-lg text-muiz-400 hover:text-red-400 hover:bg-red-400/10 transition-all"
-            title="Delete document"
-          >
-            <HiOutlineTrash className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Doc name */}
-        <div className="px-4 sm:px-6 pt-4 pb-2">
-          <h3 className="text-sm font-semibold text-white font-mono">
-            {selectedDoc.name}
-          </h3>
-          <p className="text-[11px] text-muiz-400 mt-0.5">
-            {new Date(selectedDoc.createdAt).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })}
-          </p>
-        </div>
-
-        {/* MD content */}
-        <div className="px-4 sm:px-6 pb-6 pt-2">
-          <div className="bg-white/5 rounded-xl p-4 sm:p-6">
-            <MDViewer content={selectedDoc.content} />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+  // ─── Slide-over overlay for viewing a document ──────────────────────
   return (
-    <div className="glass rounded-2xl p-5 animate-fade-in-up">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
-          Documents
-        </h3>
-        <button
-          onClick={() => {
-            setShowUpload(!showUpload);
-            if (!showUpload) setTimeout(() => fileInputRef.current?.click(), 100);
-          }}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-all"
-        >
-          <HiOutlinePlus className="w-3.5 h-3.5" />
-          Upload
-        </button>
+    <>
+      {/* Overlay backdrop */}
+      {selectedDoc && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+          onClick={() => setSelectedDoc(null)}
+        />
+      )}
+
+      {/* Slide-over panel */}
+      <div
+        className={`fixed top-0 right-0 z-50 h-full w-full sm:w-[640px] lg:w-[800px] bg-[#0a0a0f] border-l border-white/10 shadow-2xl transform transition-transform duration-300 ease-out ${
+          selectedDoc ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        {selectedDoc && (
+          <div className="h-full flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
+              <div className="min-w-0 flex-1">
+                <h2 className="text-base font-semibold text-white font-mono truncate">
+                  {selectedDoc.name}
+                </h2>
+                <p className="text-xs text-muiz-400 mt-0.5">
+                  {new Date(selectedDoc.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 ml-4">
+                <button
+                  onClick={() => deleteDocument(selectedDoc.id)}
+                  className="p-2 rounded-lg text-muiz-400 hover:text-red-400 hover:bg-red-400/10 transition-all"
+                  title="Delete document"
+                >
+                  <HiOutlineTrash className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setSelectedDoc(null)}
+                  className="p-2 rounded-lg text-muiz-400 hover:text-white hover:bg-white/10 transition-all"
+                  title="Close"
+                >
+                  <HiOutlineX className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto px-6 py-6">
+              <div className="bg-white/5 rounded-xl p-6 sm:p-8">
+                <MDViewer content={selectedDoc.content} />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".md,.markdown"
-        onChange={handleFilePick}
-        className="hidden"
-      />
+      {/* ─── Sidebar widget ──────────────────────────────────── */}
+      <div className="glass rounded-2xl p-5 animate-fade-in-up">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
+            Documents
+          </h3>
+          <button
+            onClick={() => {
+              setShowUpload(!showUpload);
+              if (!showUpload) setTimeout(() => fileInputRef.current?.click(), 100);
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-all"
+          >
+            <HiOutlinePlus className="w-3.5 h-3.5" />
+            Upload
+          </button>
+        </div>
 
-      {/* Upload zone (shown when toggled) */}
-      {showUpload && (
-        <div
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onClick={() => fileInputRef.current?.click()}
-          className={`mb-4 p-6 rounded-xl border-2 border-dashed text-center cursor-pointer transition-all ${
-            dragOver
-              ? "border-accent bg-accent/10"
-              : "border-white/10 bg-white/5 hover:border-accent/40 hover:bg-white/8"
-          }`}
-        >
-          {uploading ? (
-            <div className="py-4">
-              <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-              <p className="text-sm text-muiz-400">Uploading...</p>
-            </div>
-          ) : (
-            <>
-              <HiOutlineUpload className="w-10 h-10 text-muiz-400 mx-auto mb-3" />
-              <p className="text-sm text-white font-medium mb-1">
-                Click to select or drag a file here
-              </p>
-              <p className="text-xs text-muiz-400">
-                .md or .markdown files only
-              </p>
-            </>
-          )}
-        </div>
-      )}
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".md,.markdown"
+          onChange={handleFilePick}
+          className="hidden"
+        />
 
-      {/* Document list */}
-      {loading ? (
-        <div className="text-center py-8">
-          <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto" />
-        </div>
-      ) : documents.length === 0 ? (
-        <div className="text-center py-8">
-          <HiOutlineDocumentText className="w-10 h-10 text-muiz-400 mx-auto mb-2" />
-          <p className="text-sm text-muiz-400">No documents yet</p>
-          <p className="text-xs text-muiz-500 mt-1">
-            Upload a Markdown file to get started
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-1">
-          {documents.map((doc) => (
-            <button
-              key={doc.id}
-              onClick={() => openDocument(doc)}
-              className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-all group text-left"
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <HiOutlineDocumentText className="w-5 h-5 text-sky-400 shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-sm text-white truncate font-mono">
-                    {doc.name}
-                  </p>
-                  <p className="text-[11px] text-muiz-400">
-                    {new Date(doc.createdAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </p>
-                </div>
+        {/* Upload zone */}
+        {showUpload && (
+          <div
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onClick={() => fileInputRef.current?.click()}
+            className={`mb-4 p-6 rounded-xl border-2 border-dashed text-center cursor-pointer transition-all ${
+              dragOver
+                ? "border-accent bg-accent/10"
+                : "border-white/10 bg-white/5 hover:border-accent/40 hover:bg-white/8"
+            }`}
+          >
+            {uploading ? (
+              <div className="py-4">
+                <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                <p className="text-sm text-muiz-400">Uploading...</p>
               </div>
+            ) : (
+              <>
+                <HiOutlineUpload className="w-10 h-10 text-muiz-400 mx-auto mb-3" />
+                <p className="text-sm text-white font-medium mb-1">
+                  Click to select or drag a file here
+                </p>
+                <p className="text-xs text-muiz-400">
+                  .md or .markdown files only
+                </p>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Document list */}
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto" />
+          </div>
+        ) : documents.length === 0 ? (
+          <div className="text-center py-8">
+            <HiOutlineDocumentText className="w-10 h-10 text-muiz-400 mx-auto mb-2" />
+            <p className="text-sm text-muiz-400">No documents yet</p>
+            <p className="text-xs text-muiz-500 mt-1">
+              Upload a Markdown file to get started
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {documents.map((doc) => (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteDocument(doc.id);
-                }}
-                className="p-1.5 rounded-lg text-muiz-400 hover:text-red-400 hover:bg-red-400/10 opacity-0 group-hover:opacity-100 transition-all shrink-0"
-                title="Delete"
+                key={doc.id}
+                onClick={() => openDocument(doc)}
+                className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-all group text-left"
               >
-                <HiOutlineTrash className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-3 min-w-0">
+                  <HiOutlineDocumentText className="w-5 h-5 text-sky-400 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm text-white truncate font-mono">
+                      {doc.name}
+                    </p>
+                    <p className="text-[11px] text-muiz-400">
+                      {new Date(doc.createdAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteDocument(doc.id);
+                  }}
+                  className="p-1.5 rounded-lg text-muiz-400 hover:text-red-400 hover:bg-red-400/10 opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                  title="Delete"
+                >
+                  <HiOutlineTrash className="w-3.5 h-3.5" />
+                </button>
               </button>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
