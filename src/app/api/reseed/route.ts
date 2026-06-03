@@ -193,9 +193,56 @@ const todos: TodoSeed[] = [
   },
 ];
 
+const CREATE_TABLES_SQL = [
+  `CREATE TABLE IF NOT EXISTS "Project" (
+    "id" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "shortName" TEXT NOT NULL,
+    "clientName" TEXT NOT NULL DEFAULT 'Excellenta Cyber',
+    "description" TEXT NOT NULL,
+    "techStack" TEXT NOT NULL,
+    "techDetails" TEXT NOT NULL,
+    "deploymentNotes" TEXT,
+    "runtimeNotes" TEXT,
+    "siteUrl" TEXT,
+    "localDir" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'Active',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    PRIMARY KEY ("id")
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS "Project_slug_key" ON "Project"("slug")`,
+  `CREATE TABLE IF NOT EXISTS "Note" (
+    "id" TEXT NOT NULL,
+    "projectId" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("id"),
+    FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE
+  )`,
+  `CREATE TABLE IF NOT EXISTS "Todo" (
+    "id" TEXT NOT NULL,
+    "projectId" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
+    "done" BOOLEAN NOT NULL DEFAULT false,
+    "order" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("id"),
+    FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE
+  )`,
+];
+
 export async function GET() {
   try {
     const results: string[] = [];
+
+    // Create tables if they don't exist (Prisma CLI's db push doesn't support libsql:// URLs)
+    results.push("Creating tables...");
+    for (const sql of CREATE_TABLES_SQL) {
+      await prisma.$executeRawUnsafe(sql);
+    }
+    results.push("✅ Tables created");
 
     // Seed projects
     for (const p of projects) {
