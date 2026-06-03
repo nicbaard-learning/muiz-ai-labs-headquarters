@@ -12,6 +12,7 @@ import GlobalSearch from "@/components/global-search";
 import TodoSection from "@/components/todo-section";
 import NotesSection from "@/components/notes-section";
 import LinksSection from "@/components/links-section";
+import DocumentRepository from "@/components/document-repository";
 
 interface TechItem {
   name: string;
@@ -293,6 +294,9 @@ export default function ProjectDetailPage({
                 initialNotes={project.notes}
               />
             </div>
+
+            {/* Documents */}
+            <DocumentRepository projectId={project.slug} />
           </div>
         </div>
       </main>

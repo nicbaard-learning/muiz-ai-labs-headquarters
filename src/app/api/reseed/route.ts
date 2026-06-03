@@ -220,6 +220,149 @@ const todos: TodoSeed[] = [
   },
 ];
 
+const MD_CONTENT: Record<string, string> = {
+  tprm: `# PROJECT_DETAILS_TPRM
+
+Excellenta TPRM is a multi-tenant third-party risk management platform that helps organizations manage vendor relationships from onboarding to offboarding in one secure workflow. The system supports vendor due diligence, questionnaire management, risk scoring, document handling, approvals, audit visibility, and reporting, while keeping each client organization's data isolated. It is designed for practical, day-to-day risk operations, giving business, procurement, and risk teams a shared workspace to make faster and better-informed decisions about third-party risk.
+
+## Tech Stack and Requirements
+
+- Backend: Flask (Python), SQLAlchemy, Flask-Login, Flask-WTF
+- Frontend: Bootstrap 5, Jinja2 templates, vanilla JavaScript
+- Database: SQLite for development, PostgreSQL for production
+- Reporting: ReportLab-based PDF generation (pure Python)
+- AI Integration: Groq-powered Tess assistant and AI due diligence features
+- Security: RBAC, CSRF protection, input validation, multi-tenant client isolation
+
+### Runtime and Setup Requirements
+
+- Python 3.8+
+- Virtual environment support (\`venv\` recommended)
+- Git
+- Environment variable configuration for:
+  - Application secrets and database connection
+  - SMTP email delivery
+  - AI and external service keys where applicable
+
+## Deployment
+
+Deployment follows a Git-driven flow through Azure DevOps and then onto Hetzner infrastructure:
+
+- Source control is maintained in Git.
+- Code changes are pushed to Azure DevOps repositories as the central integration point.
+- From Azure DevOps, the deployment workflow is promoted to the Hetzner-hosted environment.
+- Hetzner runs the production instance of the Excellenta TPRM platform.`,
+  grc: `# PROJECT_DETAILS_GRC
+
+Excellenta GRC is a multi-tenant cybersecurity governance, risk, and compliance platform built from the ground up around the ExcelCyber Capability Model. It provides organisations with a structured framework to assess, track, and improve their cybersecurity posture across three top-level domains: Govern, Risk & Assure; Protect & Defend; and Identity & Data.
+
+The system supports a three-tier capability hierarchy — 41 L1 capabilities, 164 L2 sub-capabilities, and configurable lowest-level checklist items under each L2 — with real-time progress rollup from individual checklist items all the way up to the organisational dashboard.
+
+The application is in **early development**. It is not yet feature-complete, has not been user-tested, and has no deployment or production path defined. The current build is a functional prototype suitable for demonstration and local evaluation.
+
+## Tech Stack and Requirements
+
+- Backend: FastAPI (Python 3.12+), SQLAlchemy 2.0, JWT-based authentication
+- Frontend: Next.js 16, React 19, TypeScript, Tailwind CSS 4, shadcn/ui, Framer Motion
+- Database: SQLite for local development, PostgreSQL for production
+- Auth: Local email/password with bcrypt hashing; architecture ready for SSO/MFA later
+- Security: RBAC (Admin, Assessor, Contributor, Viewer), audit logging, CSRF/XSS protections
+
+### Runtime and Setup Requirements
+
+- Python 3.12+
+- Node.js 20+ (tested with v24)
+- No database server required for local development (SQLite is file-based)
+- Environment variable configuration via \`backend/.env\`:
+  - \`DATABASE_URL\` — Connection string (defaults to SQLite for dev)
+  - \`SECRET_KEY\` — JWT signing secret
+  - \`ALGORITHM\` — JWT algorithm (HS256)
+  - \`ACCESS_TOKEN_EXPIRE_MINUTES\` — Token lifetime
+
+## Current State (Early Development)
+
+This project is at the very beginning of its lifecycle. The following have been implemented:
+
+- ✅ Full backend API with models, services, and routers
+- ✅ Complete capability hierarchy seeded (41 L1 × 4 L2 each = 164 sub-capabilities, 5 checklist items per L2 = 820 total)
+- ✅ Login, dashboard, and drill-down views (domain → L1 → L2 → checklist)
+- ✅ Status management with real-time progress aggregation
+- ✅ Global search, dark mode, user profile
+- ✅ Frontend builds and is navigable
+
+## Deployment
+
+There is currently no deployment path. The project runs locally only.`,
+  sfr: `# PROJECT_DETAILS_SFR
+
+Excellenta SFR (Shared Framework Repository) is a standalone compliance data service that centralizes, normalizes, and exposes metadata about security, privacy, and risk frameworks. The system supports canonical framework definitions (e.g., NIST, ISO, SOC 2, GDPR), cross-framework control mappings, assessment objectives, evidence requirements, compensating controls, and jurisdiction/business-model applicability rules.
+
+## Tech Stack and Requirements
+
+- Backend: FastAPI (Python), SQLAlchemy 2.0 (ORM), Pydantic v2 (schema validation)
+- Frontend: Jinja2 templates, Bootstrap 5, vanilla JavaScript, custom CSS
+- Database: PostgreSQL 15+
+- Data Import: pandas/openpyxl-based SCF workbook ingestion pipeline
+- AI Integration: Model Context Protocol (MCP) server for AI-agent tool access; GitHub-backed SCF version tracking
+- Security: CORS protection, DNS rebinding protection (MCP host/origin validation), structured error handling, environment-based secrets management
+- Migrations: Alembic for database schema versioning
+
+### Runtime and Setup Requirements
+
+- Python 3.12+
+- Virtual environment support (\`venv\` recommended)
+- Git
+- PostgreSQL 15+
+- Environment variable configuration for:
+  - \`DATABASE_URL\` – PostgreSQL connection string
+  - \`MCP_API_KEY\` – API key for MCP tool access
+  - Application title and version metadata
+  - Allowed host/origin lists for MCP transport security
+
+## Deployment
+
+Deployment follows a Git-driven flow through GitHub and onto Render:
+
+- Source control is maintained in Git (GitHub: \`nicbaard-learning/excellenta-sfr\`).
+- Code changes are pushed to the GitHub repository as the central integration point.
+- From GitHub, Render auto-deploys via connected repository and blueprint configuration (\`render.yaml\`).
+- Render runs the production instance, using \`gunicorn\` with \`uvicorn\` workers to serve the FastAPI application.`,
+  prayforgreg: `# Pray for Greg
+
+Pray for Greg is a beautifully crafted direct prayer roster and support coordinator web application built for Greg's supportive community. This platform serves as a modern, reliable, and secure portal for coordinating prayer days, claiming roster spots, communicating date trades/swaps, and sending personal letters of encouragement and scriptures directly to Greg.
+
+The application is engineered to preserve a clean personal dashboard, offering interactive calendars for scheduling, high-performance media uploads, standard Web-Push notification infrastructure to immediately alert Greg, and direct WhatsApp integrations to simplify community sharing.
+
+## Tech Stack and Requirements
+
+- **Backend**: Node.js with Express, tsx type-stripping runtime, and \`web-push\` notifications protocol
+- **Frontend**: React 19, Vite, Tailwind CSS v4, Motion (fluid animations), and \`lucide-react\` vector iconography
+- **Database & Storage**: Google Cloud Firestore (persistent NoSQL document storage) and Firebase Cloud Storage (secure binary uploads with mime-type routing)
+- **Push Notification Infrastructure**: Standard W3C Push API powered by custom VAPID public/private key coordinates
+
+### Runtime and Setup Requirements
+
+- **Node.js**: Version 18+ or 20+
+- **Environment Configuration**: Supported via \`.env\` or container settings securing keys for VAPID keys and Firebase project coordinates
+- **Port Ingress**: Configured statically to listen exclusively on host \`0.0.0.0\` and port \`3000\`
+
+## Core Features & Workflows
+
+1. **Roster Scheduler**: Fully interactive direct date claims, swaps, and trade requests.
+2. **Clickable Support Wall**: Converts plain comments and media uploads into beautiful cards with high-contrast clickable anchors.
+3. **Optimized Media Hosting**: Integrates drag-and-drop uploads. Images are resized and hosted permanently on Firebase Cloud Storage.
+4. **Instant Push Alerting**: Dispatches standard native browser alert payloads directly to Greg's subscribed devices.
+5. **WhatsApp Integration**: Onboarding links and calendar synchronization triggers custom pre-filled WhatsApp templates.
+
+## Deployment
+
+The application is deployed on fully managed cloud infrastructure structured to serve real-time experiences:
+
+- **Source Control**: Integrated on top of versioned Git tracking.
+- **Preview & Dev Environment**: Hosted as a fully isolated, containerized application run on Google Cloud Run behind an Nginx reverse-proxy router.
+- **Database Layer**: Deployed onto high-durability regional Firestore instances.`,
+};
+
 const CREATE_TABLES_SQL = [
   `CREATE TABLE IF NOT EXISTS "Project" (
     "id" TEXT NOT NULL,
@@ -255,6 +398,16 @@ const CREATE_TABLES_SQL = [
     "done" BOOLEAN NOT NULL DEFAULT false,
     "order" INTEGER NOT NULL DEFAULT 0,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("id"),
+    FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE
+  )`,
+  `CREATE TABLE IF NOT EXISTS "ProjectDocument" (
+    "id" TEXT NOT NULL,
+    "projectId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
     PRIMARY KEY ("id"),
     FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE
   )`,
@@ -325,6 +478,26 @@ export async function GET() {
         },
       });
       results.push(`  📋 Todo: "${t.text}"`);
+    }
+
+    // Seed documents — clear existing documents, then seed from MD_CONTENT
+    await prisma.projectDocument.deleteMany();
+    for (const [slug, mdContent] of Object.entries(MD_CONTENT)) {
+      const project = await prisma.project.findUnique({
+        where: { slug },
+      });
+      if (!project) {
+        results.push(`⚠️  Document skipped — project "${slug}" not found`);
+        continue;
+      }
+      await prisma.projectDocument.create({
+        data: {
+          projectId: project.id,
+          name: `PROJECT_DETAILS_${slug.toUpperCase()}.md`,
+          content: mdContent,
+        },
+      });
+      results.push(`  📄 Document: ${slug.toUpperCase()}.md`);
     }
 
     return new Response(
