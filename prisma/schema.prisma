@@ -45,6 +45,7 @@ model Todo {
   text      String
   done      Boolean  @default(false)
   order     Int      @default(0)
+  subtasks  String   @default("[]")
   createdAt DateTime @default(now())
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)

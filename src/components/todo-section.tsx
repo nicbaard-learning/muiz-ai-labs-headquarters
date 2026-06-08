@@ -1,13 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { HiPlus, HiOutlineTrash } from "react-icons/hi";
+import {
+  HiPlus,
+  HiOutlineTrash,
+  HiOutlineViewList,
+} from "react-icons/hi";
+import TodoSlideover from "./todo-slideover";
+
+interface SubTask {
+  id: string;
+  text: string;
+  done: boolean;
+}
 
 interface Todo {
   id: string;
   text: string;
   done: boolean;
   order: number;
+  subtasks: string;
 }
 
 export default function TodoSection({
@@ -21,6 +33,24 @@ export default function TodoSection({
   const [newText, setNewText] = useState("");
   const [adding, setAdding] = useState(false);
   const [filter, setFilter] = useState<"all" | "active" | "done">("all");
+  const [slideoverTodo, setSlideoverTodo] = useState<Todo | null>(null);
+
+  function parseSubtasks(todo: Todo): SubTask[] {
+    try {
+      const parsed = JSON.parse(todo.subtasks || "[]");
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function subtaskCount(todo: Todo): { total: number; done: number } {
+    const subs = parseSubtasks(todo);
+    return {
+      total: subs.length,
+      done: subs.filter((s) => s.done).length,
+    };
+  }
 
   async function addTodo() {
     if (!newText.trim()) return;
@@ -63,6 +93,7 @@ export default function TodoSection({
 
   async function deleteTodo(todoId: string) {
     setTodos((prev) => prev.filter((t) => t.id !== todoId));
+    if (slideoverTodo?.id === todoId) setSlideoverTodo(null);
     try {
       await fetch(`/api/projects/${projectId}/todos/${todoId}`, {
         method: "DELETE",
@@ -70,6 +101,13 @@ export default function TodoSection({
     } catch (e) {
       console.error("Failed to delete todo", e);
     }
+  }
+
+  function handleSlideoverUpdate(updated: Todo) {
+    setTodos((prev) =>
+      prev.map((t) => (t.id === updated.id ? updated : t))
+    );
+    setSlideoverTodo(updated);
   }
 
   const filteredTodos = todos.filter((t) => {
@@ -81,92 +119,128 @@ export default function TodoSection({
   const activeCount = todos.filter((t) => !t.done).length;
 
   return (
-    <div className="glass rounded-2xl p-5 sm:p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-          <span className="cyber-dot" />
-          To-Do&apos;s
-          <span className="text-xs font-mono text-muiz-400 ml-1">
-            {activeCount}/{todos.length}
-          </span>
-        </h3>
-        <div className="flex gap-1">
-          {(["all", "active", "done"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider transition-colors ${
-                filter === f
-                  ? "bg-accent/10 text-accent border border-accent/20"
-                  : "text-muiz-400 hover:text-muiz-300"
-              }`}
-            >
-              {f}
-            </button>
-          ))}
+    <>
+      <TodoSlideover
+        todo={slideoverTodo}
+        projectId={projectId}
+        onClose={() => setSlideoverTodo(null)}
+        onUpdate={handleSlideoverUpdate}
+      />
+
+      <div className="glass rounded-2xl p-5 sm:p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+            <span className="cyber-dot" />
+            To-Do&apos;s
+            <span className="text-xs font-mono text-muiz-400 ml-1">
+              {activeCount}/{todos.length}
+            </span>
+          </h3>
+          <div className="flex gap-1">
+            {(["all", "active", "done"] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider transition-colors ${
+                  filter === f
+                    ? "bg-accent/10 text-accent border border-accent/20"
+                    : "text-muiz-400 hover:text-muiz-300"
+                }`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Add new todo */}
+        <div className="flex gap-2 mb-4">
+          <input
+            type="text"
+            value={newText}
+            onChange={(e) => setNewText(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && addTodo()}
+            placeholder="Add a new task..."
+            className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder:text-muiz-500 focus:outline-none focus:border-accent/50 transition-colors"
+          />
+          <button
+            onClick={addTodo}
+            disabled={adding || !newText.trim()}
+            className="px-3 py-2 rounded-lg bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 disabled:opacity-40 transition-all duration-200"
+          >
+            <HiPlus className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Todo list */}
+        <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+          {filteredTodos.length === 0 && (
+            <p className="text-sm text-muiz-500 text-center py-6">
+              {filter === "all"
+                ? "No tasks yet. Add one above."
+                : filter === "active"
+                  ? "All done! 🎉"
+                  : "No completed tasks."}
+            </p>
+          )}
+          {filteredTodos.map((todo) => {
+            const subs = subtaskCount(todo);
+            return (
+              <div
+                key={todo.id}
+                className={`group flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+                  todo.done ? "bg-white/[0.02]" : "bg-white/[0.04] hover:bg-white/[0.06]"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={todo.done}
+                  onChange={(e) => toggleTodo(todo.id, e.target.checked)}
+                />
+                <span
+                  className={`flex-1 text-sm transition-all duration-200 ${
+                    todo.done
+                      ? "text-muiz-500 line-through"
+                      : "text-gray-200"
+                  }`}
+                >
+                  {todo.text}
+                </span>
+
+                {/* Subtask progress indicator */}
+                {subs.total > 0 && (
+                  <span
+                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
+                      subs.done === subs.total
+                        ? "text-emerald-400 bg-emerald-400/10"
+                        : "text-muiz-400 bg-white/5"
+                    }`}
+                  >
+                    {subs.done}/{subs.total}
+                  </span>
+                )}
+
+                {/* Expand button to open slide-over */}
+                <button
+                  onClick={() => setSlideoverTodo(todo)}
+                  className="p-1 rounded text-muiz-500 hover:text-accent hover:bg-accent/10 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                  title="Manage subtasks"
+                >
+                  <HiOutlineViewList className="w-3.5 h-3.5" />
+                </button>
+
+                {/* Delete button */}
+                <button
+                  onClick={() => deleteTodo(todo.id)}
+                  className="p-1 rounded text-muiz-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                >
+                  <HiOutlineTrash className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            );
+          })}
         </div>
       </div>
-
-      {/* Add new todo */}
-      <div className="flex gap-2 mb-4">
-        <input
-          type="text"
-          value={newText}
-          onChange={(e) => setNewText(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && addTodo()}
-          placeholder="Add a new task..."
-          className="flex-1 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder:text-muiz-500 focus:outline-none focus:border-accent/50 transition-colors"
-        />
-        <button
-          onClick={addTodo}
-          disabled={adding || !newText.trim()}
-          className="px-3 py-2 rounded-lg bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 disabled:opacity-40 transition-all duration-200"
-        >
-          <HiPlus className="w-4 h-4" />
-        </button>
-      </div>
-
-      {/* Todo list */}
-      <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
-        {filteredTodos.length === 0 && (
-          <p className="text-sm text-muiz-500 text-center py-6">
-            {filter === "all"
-              ? "No tasks yet. Add one above."
-              : filter === "active"
-                ? "All done! 🎉"
-                : "No completed tasks."}
-          </p>
-        )}
-        {filteredTodos.map((todo) => (
-          <div
-            key={todo.id}
-            className={`group flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
-              todo.done ? "bg-white/[0.02]" : "bg-white/[0.04] hover:bg-white/[0.06]"
-            }`}
-          >
-            <input
-              type="checkbox"
-              checked={todo.done}
-              onChange={(e) => toggleTodo(todo.id, e.target.checked)}
-            />
-            <span
-              className={`flex-1 text-sm transition-all duration-200 ${
-                todo.done
-                  ? "text-muiz-500 line-through"
-                  : "text-gray-200"
-              }`}
-            >
-              {todo.text}
-            </span>
-            <button
-              onClick={() => deleteTodo(todo.id)}
-              className="p-1 rounded text-muiz-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-200"
-            >
-              <HiOutlineTrash className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
+    </>
   );
 }

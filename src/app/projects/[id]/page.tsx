@@ -30,6 +30,7 @@ interface Todo {
   text: string;
   done: boolean;
   order: number;
+  subtasks: string;
 }
 
 interface Project {

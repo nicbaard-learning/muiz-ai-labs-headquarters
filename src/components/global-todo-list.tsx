@@ -4,6 +4,12 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { HiCheckCircle, HiOutlineTrash } from "react-icons/hi";
 
+interface SubTask {
+  id: string;
+  text: string;
+  done: boolean;
+}
+
 interface TodoProject {
   id: string;
   slug: string;
@@ -17,6 +23,7 @@ interface Todo {
   text: string;
   done: boolean;
   order: number;
+  subtasks: string;
   project: TodoProject;
 }
 
@@ -27,6 +34,15 @@ const PROJECT_COLORS: Record<string, string> = {
   GRC: "text-violet-400 bg-violet-400/10 border-violet-400/20",
   SFR: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
 };
+
+function parseSubtasks(todo: Todo): SubTask[] {
+  try {
+    const parsed = JSON.parse(todo.subtasks || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
 export default function GlobalTodoList({
   clientFilter,
@@ -196,38 +212,55 @@ export default function GlobalTodoList({
               </button>
 
               <div className="space-y-1">
-                {projectTodos.map((todo) => (
-                  <div
-                    key={todo.id}
-                    className={`group flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
-                      todo.done
-                        ? "bg-white/[0.02]"
-                        : "bg-white/[0.03] hover:bg-white/[0.05]"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={todo.done}
-                      onChange={(e) => toggleTodo(todo, e.target.checked)}
-                    />
-                    <span
-                      className={`flex-1 text-sm transition-all duration-200 ${
+                {projectTodos.map((todo) => {
+                  const subs = parseSubtasks(todo);
+                  return (
+                    <div
+                      key={todo.id}
+                      className={`group flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
                         todo.done
-                          ? "text-muiz-500 line-through"
-                          : "text-gray-200"
+                          ? "bg-white/[0.02]"
+                          : "bg-white/[0.03] hover:bg-white/[0.05]"
                       }`}
                     >
-                      {todo.text}
-                    </span>
-                    <button
-                      onClick={() => deleteTodo(todo)}
-                      className="p-1 rounded text-muiz-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-200"
-                      title="Delete task"
-                    >
-                      <HiOutlineTrash className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))}
+                      <input
+                        type="checkbox"
+                        checked={todo.done}
+                        onChange={(e) => toggleTodo(todo, e.target.checked)}
+                      />
+                      <span
+                        className={`flex-1 text-sm transition-all duration-200 ${
+                          todo.done
+                            ? "text-muiz-500 line-through"
+                            : "text-gray-200"
+                        }`}
+                      >
+                        {todo.text}
+                      </span>
+
+                      {/* Subtask progress indicator */}
+                      {subs.length > 0 && (
+                        <span
+                          className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
+                            subs.every((s) => s.done)
+                              ? "text-emerald-400 bg-emerald-400/10"
+                              : "text-muiz-400 bg-white/5"
+                          }`}
+                        >
+                          {subs.filter((s) => s.done).length}/{subs.length}
+                        </span>
+                      )}
+
+                      <button
+                        onClick={() => deleteTodo(todo)}
+                        className="p-1 rounded text-muiz-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                        title="Delete task"
+                      >
+                        <HiOutlineTrash className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ))}
