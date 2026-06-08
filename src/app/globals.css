@@ -140,6 +140,16 @@ body::before {
   opacity: 0;
 }
 
+/* Z-index layers for slideovers (above search panel z-50) */
+@layer utilities {
+  .z-overlay {
+    z-index: 55;
+  }
+  .z-slideover {
+    z-index: 60;
+  }
+}
+
 /* Pulse glow */
 @keyframes pulseGlow {
   0%, 100% { opacity: 0.6; }
