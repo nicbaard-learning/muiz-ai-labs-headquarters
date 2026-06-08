@@ -121,10 +121,6 @@ export default function TodoSection({
   });
 
   const activeCount = todos.filter((t) => !t.done).length;
-  const totalSubtasks = todos.reduce(
-    (acc, t) => acc + parseSubtasks(t).length,
-    0
-  );
 
   return (
     <>
@@ -144,14 +140,12 @@ export default function TodoSection({
       <div className="glass rounded-2xl p-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <div
-            onClick={() => totalSubtasks > 0 && setShowAllTodos(true)}
+            onClick={() => setShowAllTodos(true)}
             role="button"
-            tabIndex={totalSubtasks > 0 ? 0 : -1}
-            onKeyDown={(e) => e.key === 'Enter' && totalSubtasks > 0 && setShowAllTodos(true)}
-            className={`flex items-center gap-2 transition-colors ${
-              totalSubtasks > 0 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'
-            }`}
-            title={totalSubtasks > 0 ? 'View all tasks & subtasks' : undefined}
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && setShowAllTodos(true)}
+            className="flex items-center gap-2 transition-colors cursor-pointer hover:opacity-80"
+            title="View all tasks & subtasks"
           >
             <span className="cyber-dot" />
             <span className="text-sm font-semibold text-white">

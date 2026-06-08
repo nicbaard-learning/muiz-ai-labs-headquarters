@@ -49,7 +49,7 @@ export default function TodoSlideover({
   const [adding, setAdding] = useState(false);
   const [expandedTodo, setExpandedTodo] = useState<string | null>(null);
 
-  const isOpen = !!(todo || (allTodosMode && allTodos && allTodos.length > 0));
+  const isOpen = !!(todo || allTodosMode);
 
   useEffect(() => {
     if (todo) {
@@ -224,16 +224,18 @@ export default function TodoSlideover({
       {/* Overlay backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-overlay bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+          style={{ zIndex: 55 }}
           onClick={onClose}
         />
       )}
 
       {/* Slide-over panel — same exact approach as document viewer */}
       <div
-        className={`fixed top-0 right-0 z-slideover h-full w-full sm:w-[640px] lg:w-[800px] bg-[#0a0a0f] border-l border-white/10 shadow-2xl transform transition-transform duration-300 ease-out ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-[640px] lg:w-[800px] bg-[#0a0a0f] border-l border-white/10 shadow-2xl transform transition-transform duration-300 ease-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
+        style={{ zIndex: 60 }}
       >
         {isOpen && (
           <div className="h-full flex flex-col">
