@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
   HiPlus,
   HiOutlineTrash,
-  HiOutlineViewList,
 } from "react-icons/hi";
 import TodoSlideover from "./todo-slideover";
 
@@ -144,24 +143,25 @@ export default function TodoSection({
 
       <div className="glass rounded-2xl p-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+          <div
+            onClick={() => totalSubtasks > 0 && setShowAllTodos(true)}
+            role="button"
+            tabIndex={totalSubtasks > 0 ? 0 : -1}
+            onKeyDown={(e) => e.key === 'Enter' && totalSubtasks > 0 && setShowAllTodos(true)}
+            className={`flex items-center gap-2 transition-colors ${
+              totalSubtasks > 0 ? 'cursor-pointer hover:opacity-80' : 'cursor-default'
+            }`}
+            title={totalSubtasks > 0 ? 'View all tasks & subtasks' : undefined}
+          >
             <span className="cyber-dot" />
-            To-Do&apos;s
+            <span className="text-sm font-semibold text-white">
+              To-Do&apos;s
+            </span>
             <span className="text-xs font-mono text-muiz-400 ml-1">
               {activeCount}/{todos.length}
             </span>
-          </h3>
+          </div>
           <div className="flex items-center gap-2">
-            {totalSubtasks > 0 && (
-              <button
-                onClick={() => setShowAllTodos(true)}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-medium uppercase tracking-wider bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-all duration-200"
-                title="View all subtasks"
-              >
-                <HiOutlineViewList className="w-3.5 h-3.5" />
-                Subtasks
-              </button>
-            )}
             <div className="flex gap-1">
               {(["all", "active", "done"] as const).map((f) => (
                 <button
