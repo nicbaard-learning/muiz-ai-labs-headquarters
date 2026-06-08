@@ -215,49 +215,92 @@ export default function GlobalTodoList({
                 {projectTodos.map((todo) => {
                   const subs = parseSubtasks(todo);
                   return (
-                    <div
-                      key={todo.id}
-                      className={`group flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
-                        todo.done
-                          ? "bg-white/[0.02]"
-                          : "bg-white/[0.03] hover:bg-white/[0.05]"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={todo.done}
-                        onChange={(e) => toggleTodo(todo, e.target.checked)}
-                      />
-                      <span
-                        className={`flex-1 text-sm transition-all duration-200 ${
+                    <div key={todo.id}>
+                      {/* Main task row — clickable to navigate to project */}
+                      {/* Using div with role=button to avoid nested button issues */}
+                      <div
+                        onClick={() => router.push(`/projects/${todo.project.slug}`)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && router.push(`/projects/${todo.project.slug}`)}
+                        className={`w-full group flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 text-left cursor-pointer ${
                           todo.done
-                            ? "text-muiz-500 line-through"
-                            : "text-gray-200"
+                            ? "bg-white/[0.02]"
+                            : "bg-white/[0.03] hover:bg-white/[0.06]"
                         }`}
                       >
-                        {todo.text}
-                      </span>
-
-                      {/* Subtask progress indicator */}
-                      {subs.length > 0 && (
+                        {/* Checkbox — stop propagation so clicking it only toggles */}
+                        <span onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={todo.done}
+                            onChange={(e) => toggleTodo(todo, e.target.checked)}
+                          />
+                        </span>
                         <span
-                          className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
-                            subs.every((s) => s.done)
-                              ? "text-emerald-400 bg-emerald-400/10"
-                              : "text-muiz-400 bg-white/5"
+                          className={`flex-1 text-sm transition-all duration-200 ${
+                            todo.done
+                              ? "text-muiz-500 line-through"
+                              : "text-gray-200"
                           }`}
                         >
-                          {subs.filter((s) => s.done).length}/{subs.length}
+                          {todo.text}
                         </span>
-                      )}
 
-                      <button
-                        onClick={() => deleteTodo(todo)}
-                        className="p-1 rounded text-muiz-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-200"
-                        title="Delete task"
-                      >
-                        <HiOutlineTrash className="w-3.5 h-3.5" />
-                      </button>
+                        {/* Subtask progress indicator */}
+                        {subs.length > 0 && (
+                          <span
+                            className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
+                              subs.every((s) => s.done)
+                                ? "text-emerald-400 bg-emerald-400/10"
+                                : "text-muiz-400 bg-white/5"
+                            }`}
+                          >
+                            {subs.filter((s) => s.done).length}/{subs.length}
+                          </span>
+                        )}
+
+                        <span onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={() => deleteTodo(todo)}
+                            className="p-1 rounded text-muiz-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                            title="Delete task"
+                          >
+                            <HiOutlineTrash className="w-3.5 h-3.5" />
+                          </button>
+                        </span>
+                      </div>
+
+                      {/* Subtasks listed inline under the task */}
+                      {subs.length > 0 && (
+                        <div className="ml-8 pl-4 border-l border-white/5 space-y-0.5 mt-0.5 mb-1">
+                          {subs.map((sub) => (
+                            <div
+                              key={sub.id}
+                              className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-white/[0.02]"
+                            >
+                              <span
+                                className={`w-4 h-4 rounded border flex items-center justify-center text-[9px] font-bold transition-all duration-200 ${
+                                  sub.done
+                                    ? "bg-accent border-accent text-muiz-900"
+                                    : "border-muiz-400 bg-transparent"
+                                }`}
+                              >
+                                {sub.done && "✓"}
+                              </span>
+                              <span
+                                className={`text-xs transition-all duration-200 ${
+                                  sub.done
+                                    ? "text-muiz-500 line-through"
+                                    : "text-muiz-300"
+                                }`}
+                              >
+                                {sub.text}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   );
                 })}

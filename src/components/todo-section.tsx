@@ -34,6 +34,7 @@ export default function TodoSection({
   const [adding, setAdding] = useState(false);
   const [filter, setFilter] = useState<"all" | "active" | "done">("all");
   const [slideoverTodo, setSlideoverTodo] = useState<Todo | null>(null);
+  const [showAllTodos, setShowAllTodos] = useState(false);
 
   function parseSubtasks(todo: Todo): SubTask[] {
     try {
@@ -110,6 +111,10 @@ export default function TodoSection({
     setSlideoverTodo(updated);
   }
 
+  function handleAllTodosChange(updated: Todo[]) {
+    setTodos(updated);
+  }
+
   const filteredTodos = todos.filter((t) => {
     if (filter === "active") return !t.done;
     if (filter === "done") return t.done;
@@ -117,14 +122,24 @@ export default function TodoSection({
   });
 
   const activeCount = todos.filter((t) => !t.done).length;
+  const totalSubtasks = todos.reduce(
+    (acc, t) => acc + parseSubtasks(t).length,
+    0
+  );
 
   return (
     <>
       <TodoSlideover
         todo={slideoverTodo}
         projectId={projectId}
-        onClose={() => setSlideoverTodo(null)}
+        onClose={() => {
+          setSlideoverTodo(null);
+          setShowAllTodos(false);
+        }}
         onUpdate={handleSlideoverUpdate}
+        allTodos={showAllTodos ? todos : undefined}
+        allTodosMode={showAllTodos}
+        onTodosChange={showAllTodos ? handleAllTodosChange : undefined}
       />
 
       <div className="glass rounded-2xl p-5 sm:p-6">
@@ -136,20 +151,32 @@ export default function TodoSection({
               {activeCount}/{todos.length}
             </span>
           </h3>
-          <div className="flex gap-1">
-            {(["all", "active", "done"] as const).map((f) => (
+          <div className="flex items-center gap-2">
+            {totalSubtasks > 0 && (
               <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider transition-colors ${
-                  filter === f
-                    ? "bg-accent/10 text-accent border border-accent/20"
-                    : "text-muiz-400 hover:text-muiz-300"
-                }`}
+                onClick={() => setShowAllTodos(true)}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-medium uppercase tracking-wider bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-all duration-200"
+                title="View all subtasks"
               >
-                {f}
+                <HiOutlineViewList className="w-3.5 h-3.5" />
+                Subtasks
               </button>
-            ))}
+            )}
+            <div className="flex gap-1">
+              {(["all", "active", "done"] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider transition-colors ${
+                    filter === f
+                      ? "bg-accent/10 text-accent border border-accent/20"
+                      : "text-muiz-400 hover:text-muiz-300"
+                  }`}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -219,15 +246,6 @@ export default function TodoSection({
                     {subs.done}/{subs.total}
                   </span>
                 )}
-
-                {/* Expand button to open slide-over */}
-                <button
-                  onClick={() => setSlideoverTodo(todo)}
-                  className="p-1 rounded text-muiz-500 hover:text-accent hover:bg-accent/10 opacity-0 group-hover:opacity-100 transition-all duration-200"
-                  title="Manage subtasks"
-                >
-                  <HiOutlineViewList className="w-3.5 h-3.5" />
-                </button>
 
                 {/* Delete button */}
                 <button

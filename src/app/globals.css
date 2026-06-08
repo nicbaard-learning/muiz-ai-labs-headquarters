@@ -26,17 +26,37 @@
 }
 
 body {
-  background-color: var(--color-muiz-950);
+  background-color: var(--color-muiz-900);
   color: #dce8ec;
   min-height: 100vh;
 }
 
+/* Subtle radial gradient overlay for depth */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(48, 208, 184, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(64, 116, 136, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(48, 208, 184, 0.03) 0%, transparent 50%);
+  z-index: 0;
+}
+
 /* Glass morphism utilities */
 .glass {
-  background: rgba(8, 18, 28, 0.88);
+  background: rgba(18, 32, 44, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(64, 116, 136, 0.2);
+}
+
+.glass-card {
+  background: rgba(22, 40, 56, 0.6);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(64, 116, 136, 0.15);
+  border: 1px solid rgba(64, 116, 136, 0.18);
 }
 
 .glass-hover:hover {
@@ -47,8 +67,8 @@ body {
 /* Grid background pattern */
 .bg-grid {
   background-image:
-    linear-gradient(rgba(64, 116, 136, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(64, 116, 136, 0.08) 1px, transparent 1px);
+    linear-gradient(rgba(64, 116, 136, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(64, 116, 136, 0.12) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
