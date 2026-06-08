@@ -397,6 +397,7 @@ const CREATE_TABLES_SQL = [
     "text" TEXT NOT NULL,
     "done" BOOLEAN NOT NULL DEFAULT false,
     "order" INTEGER NOT NULL DEFAULT 0,
+    "subtasks" TEXT NOT NULL DEFAULT '[]',
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("id"),
     FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE
