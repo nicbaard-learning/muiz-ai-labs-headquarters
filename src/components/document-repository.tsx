@@ -146,14 +146,14 @@ export default function DocumentRepository({
       {/* Overlay backdrop */}
       {selectedDoc && (
         <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+          className="fixed inset-0 z-[55] bg-black/60 backdrop-blur-sm transition-opacity duration-300"
           onClick={() => setSelectedDoc(null)}
         />
       )}
 
       {/* Slide-over panel */}
       <div
-        className={`fixed top-0 right-0 z-50 h-full w-full sm:w-[640px] lg:w-[800px] bg-[#0a0a0f] border-l border-white/10 shadow-2xl transform transition-transform duration-300 ease-out ${
+        className={`fixed top-0 right-0 z-[60] h-full w-full sm:w-[640px] lg:w-[800px] bg-[#0a0a0f] border-l border-white/10 shadow-2xl transform transition-transform duration-300 ease-out ${
           selectedDoc ? "translate-x-0" : "translate-x-full"
         }`}
       >
