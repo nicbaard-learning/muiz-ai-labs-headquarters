@@ -219,19 +219,24 @@ export default function TodoSlideover({
     }
   }
 
-  if (!isOpen) return null;
-
   return (
     <>
       {/* Overlay backdrop */}
-      <div
-        className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+          onClick={onClose}
+        />
+      )}
 
-      {/* Slide-over panel — full page height, matching document viewer */}
-      <div className="fixed top-0 bottom-0 right-0 z-50 w-full sm:w-[640px] lg:w-[800px] bg-[#0a0a0f] border-l border-white/10 shadow-2xl animate-slide-in-right">
-        <div className="h-full flex flex-col">
+      {/* Slide-over panel — same exact approach as document viewer */}
+      <div
+        className={`fixed top-0 right-0 z-50 h-full w-full sm:w-[640px] lg:w-[800px] bg-[#0a0a0f] border-l border-white/10 shadow-2xl transform transition-transform duration-300 ease-out ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        {isOpen && (
+          <div className="h-full flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
             <div className="min-w-0 flex-1">
@@ -481,6 +486,7 @@ export default function TodoSlideover({
             ) : null}
           </div>
         </div>
+        )}
       </div>
     </>
   );

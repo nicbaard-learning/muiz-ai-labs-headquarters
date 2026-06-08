@@ -281,12 +281,10 @@ export default function ProjectDetailPage({
             </div>
 
             {/* To-Do's */}
-            <div className="animate-fade-in-up">
-              <TodoSection
-                projectId={project.id}
-                initialTodos={project.todos}
-              />
-            </div>
+            <TodoSection
+              projectId={project.id}
+              initialTodos={project.todos}
+            />
 
             {/* Notes */}
             <div className="animate-fade-in-up">
